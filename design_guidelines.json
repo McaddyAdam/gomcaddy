@@ -1,0 +1,155 @@
+{
+  "project_name": "GoMcaddy",
+  "identity": {
+    "tone": "Vibrant, Playful, Appetizing, Fast, Nigerian-Modern",
+    "persona": "The Energetic Foodie Friend",
+    "key_phrase": "Chop Now, No Long Thing",
+    "archetype": "Vibrant Play (Archetype 6) with Organic/Earthy roots"
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Fredoka, sans-serif",
+      "usage": "Headings, Hero Text, Call-to-Actions",
+      "weights": ["600", "700"],
+      "import_url": "https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap"
+    },
+    "body": {
+      "font_family": "DM Sans, sans-serif",
+      "usage": "Paragraphs, UI Text, Menus",
+      "weights": ["400", "500", "700"],
+      "import_url": "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap"
+    },
+    "rules": "Headings must be 'Fredoka' for that friendly, rounded look. Body text 'DM Sans' for high readability. Use tight tracking for large headings."
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "name": "Spicy Orange",
+        "value": "25 95% 53%",
+        "hex": "#FA6B1A",
+        "usage": "Primary Buttons, CTAs, Highlights, Brand Logo"
+      },
+      "secondary": {
+        "name": "Fresh Green",
+        "value": "145 63% 42%",
+        "hex": "#27AF60",
+        "usage": "Success states, Vegetarian tags, Price badges, Accents"
+      },
+      "background": {
+        "name": "Warm Rice",
+        "value": "40 20% 98%",
+        "hex": "#FBF9F6",
+        "usage": "Main Page Background (Avoid pure white)"
+      },
+      "card": {
+        "name": "Pure White",
+        "value": "0 0% 100%",
+        "hex": "#FFFFFF",
+        "usage": "Card backgrounds, Modals"
+      },
+      "foreground": {
+        "name": "Charcoal",
+        "value": "20 10% 15%",
+        "hex": "#2A2422",
+        "usage": "Main Text"
+      },
+      "muted": {
+        "name": "Savoury Grey",
+        "value": "30 10% 94%",
+        "hex": "#F2F0ED",
+        "usage": "Secondary backgrounds, borders"
+      },
+       "accent": {
+        "name": "Zobo Purple",
+        "value": "330 60% 50%",
+        "hex": "#CC3366",
+        "usage": "Special offers, 'New' tags, whimsical elements"
+      }
+    },
+    "css_vars": {
+      "--background": "40 20% 98%",
+      "--foreground": "20 10% 15%",
+      "--card": "0 0% 100%",
+      "--card-foreground": "20 10% 15%",
+      "--popover": "0 0% 100%",
+      "--popover-foreground": "20 10% 15%",
+      "--primary": "25 95% 53%",
+      "--primary-foreground": "0 0% 100%",
+      "--secondary": "145 63% 42%",
+      "--secondary-foreground": "0 0% 100%",
+      "--muted": "30 10% 94%",
+      "--muted-foreground": "25 5% 45%",
+      "--accent": "330 60% 50%",
+      "--accent-foreground": "0 0% 100%",
+      "--destructive": "0 84.2% 60.2%",
+      "--destructive-foreground": "0 0% 98%",
+      "--border": "30 10% 90%",
+      "--input": "30 10% 90%",
+      "--ring": "25 95% 53%",
+      "--radius": "1rem"
+    },
+    "gradients": {
+        "hero_overlay": "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%)",
+        "primary_button": "linear-gradient(135deg, #FA6B1A 0%, #E85D0F 100%)"
+    }
+  },
+  "layout": {
+    "spacing": "Generous padding. Use p-6 or p-8 inside cards. Gap-8 for grids.",
+    "container": "Max-width 1400px. Centered.",
+    "border_radius": "rounded-2xl or rounded-3xl for everything. No sharp corners.",
+    "grid_styles": {
+      "restaurant_grid": "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8",
+      "menu_grid": "grid-cols-1 md:grid-cols-2 gap-6"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-white rounded-full px-8 py-4 font-bold hover:scale-105 transition-transform shadow-[0_10px_20px_rgba(250,107,26,0.2)]",
+      "secondary": "bg-white border-2 border-muted text-foreground rounded-full px-6 py-3 font-medium hover:border-primary hover:text-primary transition-colors"
+    },
+    "cards": {
+      "restaurant": "bg-card rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-border/50 group",
+      "menu_item": "bg-card rounded-2xl p-4 flex gap-4 items-center hover:bg-muted/50 transition-colors border border-border/30"
+    },
+    "inputs": {
+      "style": "bg-muted/50 border-transparent focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10 rounded-xl h-12 px-4"
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_bg": "https://images.pexels.com/photos/17952746/pexels-photo-17952746.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "hero_alt": "https://images.pexels.com/photos/17952748/pexels-photo-17952748.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "delivery_rider": "https://images.pexels.com/photos/16238131/pexels-photo-16238131.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "categories": {
+        "burger": "https://images.pexels.com/photos/2271107/pexels-photo-2271107.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "pizza": "https://images.pexels.com/photos/31029949/pexels-photo-31029949.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "nigerian_soup": "https://images.pexels.com/photos/35490114/pexels-photo-35490114.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "healthy": "https://images.unsplash.com/photo-1741026079032-7cb660e44bad?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwyfHxib3dsJTIwb2YlMjBwb3VuZGVkJTIweWFtJTIwYW5kJTIwZWd1c2klMjBzb3VwJTIwbmlnZXJpYW4lMjBmb29kfGVufDB8fHx8MTc3MTk2NzIzMXww&ixlib=rb-4.1.0&q=85"
+      },
+      "restaurants": [
+        "https://images.unsplash.com/photo-1720799359126-2cda1a741c52?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhZnJpY2FuJTIwcmVzdGF1cmFudCUyMGludGVyaW9yJTIwdmlicmFudCUyMGxpdmVseXxlbnwwfHx8fDE3NzE5NjcyMjV8MA&ixlib=rb-4.1.0&q=85",
+        "https://images.pexels.com/photos/28673617/pexels-photo-28673617.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "https://images.unsplash.com/photo-1687717324494-6476dd0d9dec?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBhZnJpY2FuJTIwcmVzdGF1cmFudCUyMGludGVyaW9yJTIwdmlicmFudCUyMGxpdmVseXxlbnwwfHx8fDE3NzE5NjcyMjV8MA&ixlib=rb-4.1.0&q=85"
+      ]
+    },
+    "icons": "Use 'lucide-react'. Style: rounded, stroke-width=2.5.",
+    "logo_style": "Text based 'GoMcaddy' with a smile curve under 'Mcaddy' or a bike wheel icon."
+  },
+  "motion": {
+    "page_transition": "initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}",
+    "hover_card": "whileHover={{ y: -8 }}",
+    "button_tap": "whileTap={{ scale: 0.95 }}",
+    "loading": "Use a spinning plate or jumping burger animation."
+  },
+  "universal_guidelines": [
+    "Always use 'Fredoka' for headers. It is the brand voice.",
+    "Never use pure black shadows. Use colored shadows (orange/brown) for warmth.",
+    "Images must have 'object-cover' and rounded corners.",
+    "Use 'grid-cols-1' for mobile first. Don't break layout on small screens.",
+    "Interactive elements MUST have `data-testid` attributes (e.g., `add-to-cart-btn`).",
+    "Use 'sonner' for toast notifications. Success = Green, Error = Red.",
+    "Payment integration (Paystack) should be mocked if keys are missing, but UI must be complete.",
+    "Do not use gradients for text. Keep text solid for readability."
+  ],
+  "instructions_to_main_agent": "1. Update `index.css` with the provided CSS variables. 2. Install 'lucide-react', 'framer-motion', 'clsx', 'tailwind-merge'. 3. Create a 'Header' component with a sticky glassmorphism effect. 4. Build the 'RestaurantCard' component first as it is the core UI element. 5. Use the provided image URLs for the dummy data seeding."
+}
