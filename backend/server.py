@@ -295,7 +295,7 @@ async def admin_login(data: AdminLogin):
         admin_user = {
             'id': admin_id,
             'name': 'Admin',
-            'email': 'mcaddytechsolutions@gmail.com',
+            'email': 'admin@gomcaddy.com',
             'is_admin': True
         }
         token = create_token(admin_id)

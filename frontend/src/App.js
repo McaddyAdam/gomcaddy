@@ -12,7 +12,6 @@ import { PaymentCallback } from './pages/PaymentCallback';
 import { Orders } from './pages/Orders';
 import { OrderDetail } from './pages/OrderDetail';
 import { Toaster } from './components/ui/sonner';
-import Footer from './components/Footer';
 import '@/App.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -71,7 +70,6 @@ function AppContent() {
           }
         />
       </Routes>
-      <Footer />
       <Toaster position="top-center" />
     </div>
   );

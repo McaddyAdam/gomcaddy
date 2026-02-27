@@ -63,7 +63,7 @@ export const AdminLogin = () => {
                 required
                 className="mt-1"
                 data-testid="admin-username-input"
-                placeholder="Enter your admin username"
+                placeholder="admin"
               />
             </div>
             <div>
@@ -76,7 +76,7 @@ export const AdminLogin = () => {
                 required
                 className="mt-1"
                 data-testid="admin-password-input"
-                placeholder="Enter your password"
+                placeholder="admin123"
               />
             </div>
             <Button
@@ -96,8 +96,9 @@ export const AdminLogin = () => {
           </div>
 
           <div className="mt-6 p-4 bg-muted/50 rounded-xl text-sm text-muted-foreground">
-            <p className="font-medium mb-1">Need access?</p>
-            <p>If you need admin access, contact <strong>admin@mcaddytechsolutions.com</strong>.</p>
+            <p className="font-medium mb-1">Demo Credentials:</p>
+            <p>Username: admin</p>
+            <p>Password: admin123</p>
           </div>
         </div>
       </motion.div>

@@ -26,11 +26,8 @@ export const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center space-x-3" data-testid="logo-link">
-            <div>
-              <div className="text-3xl font-bold heading-font text-primary" data-testid="app-logo">
-                GoMcaddy
-              </div>
-              <div className="text-xs text-muted-foreground -mt-1">Chop Now, No Long Thing</div>
+            <div className="text-3xl font-bold heading-font text-primary" data-testid="app-logo">
+              GoMcaddy
             </div>
           </Link>
 
