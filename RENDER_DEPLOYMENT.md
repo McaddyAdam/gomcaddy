@@ -1,113 +1,141 @@
 # Gomcaddy Render Deployment Guide
 
-You can deploy this project to Render as **one single Web Service** by deploying only the `frontend/` app.
+Deploy Gomcaddy to Render as one Node web service using only the [frontend](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/frontend) app.
 
-That works because the Next.js app now handles:
+This works because the Next.js app already handles:
 
-- frontend pages
-- API routes
-- MongoDB database access
-- login and signup logic
+- the website UI
+- the `/api/*` routes
+- MongoDB access
+- registration and login
 
-So for Render, you do **not** need to deploy `backend/` separately.
+You do not need to deploy [backend](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/backend) to Render for the current production setup.
 
-## What to deploy
+**Before You Start**
+
+- Push this repository to GitHub, GitLab, or Bitbucket
+- Make sure your MongoDB database is reachable from Render
+- Make sure the `frontend` app has valid values for `MONGODB_URI` and `JWT_SECRET`
+
+**What To Deploy**
 
 Deploy only:
 
 - [frontend](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/frontend)
 
-The `backend/` folder can remain in the repo for local development or reference, but it is not required for the one-service Render deployment flow.
+Render should treat it as a Node web service, not a static site.
 
-## 1. Push your code to GitHub
+**Render Settings**
 
-Render deploys from a Git provider, so first push this repository to GitHub, GitLab, or Bitbucket.
+Create a new Web Service in Render and use these values:
 
-## 2. Create one Render Web Service
+- Service type: `Web Service`
+- Environment: `Node`
+- Root Directory: `frontend`
+- Build Command: `npm install && npm run build`
+- Start Command: `npm start`
 
-In Render:
+Recommended:
 
-1. Click **New**
-2. Select **Web Service**
-3. Connect your repository
+- Branch: your production branch, usually `main`
+- Auto-Deploy: enabled
 
-Use these settings:
+Why these commands:
 
-- **Name**: `gomcaddy`
-- **Root Directory**: `frontend`
-- **Environment**: `Node`
-- **Build Command**: `npm install && npm run build`
-- **Start Command**: `npm start`
+- `npm run build` creates the Next.js production build
+- `npm start` runs `next start` inside `frontend`
 
-## 3. Add environment variables in Render
+**Environment Variables**
 
-In the Render service, open **Environment** and add:
+Add these in Render under the service Environment tab:
 
 - `MONGODB_URI`
 - `JWT_SECRET`
 - `NODE_ENV`
 
-Recommended values:
+Example values:
 
 ```env
-MONGODB_URI=your-mongodb-atlas-connection-string
-JWT_SECRET=your-long-random-secret
+MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster.mongodb.net/gomcaddy?retryWrites=true&w=majority
+JWT_SECRET=replace-with-a-long-random-secret
 NODE_ENV=production
 ```
 
-## 4. MongoDB Atlas setup
+Notes:
 
-Since Render will connect directly to MongoDB Atlas:
+- `MONGODB_URI` must point to a real MongoDB Atlas or MongoDB server
+- `JWT_SECRET` should be long and hard to guess
+- Do not commit production secrets into the repo
+
+**MongoDB Atlas Checklist**
+
+Because the app connects to MongoDB directly from Render:
 
 1. Open MongoDB Atlas
-2. Go to **Network Access**
-3. Make sure Atlas allows your Render service to connect
+2. Go to `Network Access`
+3. Allow Render to connect
+4. Go to `Database Access`
+5. Confirm the username and password in `MONGODB_URI` are correct
 
-For testing, some people temporarily allow:
+For testing, many teams temporarily allow:
 
 ```text
 0.0.0.0/0
 ```
 
-For production, restrict access properly if possible.
+That is easy for setup, but it is broader than ideal. Tighten it later if you can.
 
-## 5. Deploy
+**Deploy Steps**
 
-After the environment variables are added, Render will build and start the service.
+1. Push your latest code
+2. Create the Render Web Service
+3. Set the root directory to `frontend`
+4. Add the environment variables
+5. Start the deploy
+6. Wait for the build logs to show `next build` completed
+7. Open the generated Render URL
 
-Your live app will serve:
+**Verify After Deploy**
 
-- the frontend pages
-- the API endpoints under `/api/...`
+Check these in the live app:
 
-from the same Render web service.
+- `/` loads
+- `/menu` loads restaurants and menu items
+- `/api/restaurants?type=restaurant` returns JSON
+- `/api/categories` returns JSON
+- signup works
+- login works
 
-## 6. Verify deployment
+If menu data is missing, confirm your MongoDB database actually contains restaurants and menu records or fallback data.
 
-After deployment:
+**Common Problems**
 
-1. Open your Render app URL
-2. Confirm the homepage loads
-3. Confirm restaurants and menu items load
-4. Test signup and login
-5. Test adding items to cart
+- Build fails with missing env vars:
+  Set `MONGODB_URI` and `JWT_SECRET` in Render, then redeploy.
+- App deploys but restaurants do not load:
+  Check MongoDB Atlas network access and database credentials.
+- Render points at the wrong folder:
+  Make sure `Root Directory` is exactly `frontend`.
+- You deployed the backend separately and the app still looks broken:
+  The production app uses the Next.js server routes in `frontend`; the old Express backend is not required.
+- Images look different from local:
+  The app uses unoptimized Next image handling in production, which is expected with the current config.
 
-## 7. Important notes
+**Current Production Shape**
 
-- Do not set `BACKEND_API_URL` for the one-service Render deployment. It is no longer needed.
-- The `frontend/` app now talks directly to MongoDB through Next.js server routes.
-- Keep `JWT_SECRET` private and set it only in Render and your local env file.
-- Deploy this as a **Web Service**, not a Static Site.
+- Frontend runtime: Next.js in [frontend](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/frontend)
+- Database access: server-side through [mongodb.ts](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/frontend/lib/mongodb.ts)
+- Menu and restaurant API: Next.js route handlers under [app/api](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/frontend/app/api)
 
-## 8. Render summary
+**Render Summary**
 
-- Service type: **Web Service**
-- Root directory: `frontend`
-- Build: `npm install && npm run build`
-- Start: `npm start`
+- Deploy folder: `frontend`
+- Build command: `npm install && npm run build`
+- Start command: `npm start`
+- Required env vars: `MONGODB_URI`, `JWT_SECRET`, `NODE_ENV`
 
-## Official Render references
+**Official Render Docs**
 
-- Next.js on Render: https://render.com/docs/deploy-nextjs-app
-- Web services: https://render.com/docs/web-services
-- Environment variables: https://render.com/docs/configure-environment-variables
+- https://render.com/docs/deploy-nextjs-app
+- https://render.com/docs/web-services
+- https://render.com/docs/configure-environment-variables
