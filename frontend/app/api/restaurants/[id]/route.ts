@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchBackend } from '@/lib/backend-api';
-import type { Restaurant } from '@/types/types';
+import { getRestaurantById } from '@/lib/server-api';
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const restaurant = await fetchBackend<Restaurant>(`/api/restaurants/${params.id}`);
+    const restaurant = await getRestaurantById(params.id);
+
+    if (!restaurant) {
+      return NextResponse.json({ error: 'Restaurant not found' }, { status: 404 });
+    }
+
     return NextResponse.json(restaurant);
   } catch (error) {
     return NextResponse.json(

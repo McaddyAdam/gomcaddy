@@ -1,116 +1,105 @@
 # Gomcaddy Render Deployment Guide
 
-This project should be deployed to Render as **two separate Web Services**:
+You can deploy this project to Render as **one single Web Service** by deploying only the `frontend/` app.
 
-- `backend/` as a Node + Express API
-- `frontend/` as a Next.js web app
+That works because the Next.js app now handles:
 
-This matches Render's current docs for:
+- frontend pages
+- API routes
+- MongoDB database access
+- login and signup logic
 
-- Next.js apps deployed as a **Node Web Service**
-- Express apps deployed as a **Node Web Service**
+So for Render, you do **not** need to deploy `backend/` separately.
+
+## What to deploy
+
+Deploy only:
+
+- [frontend](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/frontend)
+
+The `backend/` folder can remain in the repo for local development or reference, but it is not required for the one-service Render deployment flow.
 
 ## 1. Push your code to GitHub
 
-Render deploys from a Git provider, so first make sure this repository is pushed to GitHub, GitLab, or Bitbucket.
+Render deploys from a Git provider, so first push this repository to GitHub, GitLab, or Bitbucket.
 
-## 2. Deploy the backend on Render
-
-In Render:
-
-1. Click **New**.
-2. Select **Web Service**.
-3. Connect your repository.
-4. Set the following values:
-
-### Backend settings
-
-- **Name**: `gomcaddy-backend`
-- **Root Directory**: `backend`
-- **Environment**: `Node`
-- **Build Command**: `npm install`
-- **Start Command**: `npm start`
-
-### Backend environment variables
-
-Add these in Render under the backend service's **Environment** tab:
-
-- `MONGODB_URI` = your MongoDB Atlas connection string
-- `JWT_SECRET` = a strong secret key
-- `NODE_ENV` = `production`
-
-You do **not** need to hardcode `PORT` on Render unless you want to override it. Render automatically provides a port for web services.
-
-## 3. Get the backend Render URL
-
-After the backend deploys, Render will give you a public URL such as:
-
-```text
-https://gomcaddy-backend.onrender.com
-```
-
-Copy that URL. You will use it in the frontend environment variables.
-
-## 4. Deploy the frontend on Render
+## 2. Create one Render Web Service
 
 In Render:
 
-1. Click **New**.
-2. Select **Web Service**.
-3. Connect the same repository.
-4. Set the following values:
+1. Click **New**
+2. Select **Web Service**
+3. Connect your repository
 
-### Frontend settings
+Use these settings:
 
-- **Name**: `gomcaddy-frontend`
+- **Name**: `gomcaddy`
 - **Root Directory**: `frontend`
 - **Environment**: `Node`
 - **Build Command**: `npm install && npm run build`
 - **Start Command**: `npm start`
 
-### Frontend environment variables
+## 3. Add environment variables in Render
 
-Add:
+In the Render service, open **Environment** and add:
 
-- `BACKEND_API_URL` = your backend Render URL
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `NODE_ENV`
 
-Example:
+Recommended values:
 
-```text
-BACKEND_API_URL=https://gomcaddy-backend.onrender.com
+```env
+MONGODB_URI=your-mongodb-atlas-connection-string
+JWT_SECRET=your-long-random-secret
+NODE_ENV=production
 ```
 
-## 5. Redeploy the frontend after setting env vars
+## 4. MongoDB Atlas setup
 
-Once `BACKEND_API_URL` is saved, trigger a deploy if Render does not do it automatically.
+Since Render will connect directly to MongoDB Atlas:
+
+1. Open MongoDB Atlas
+2. Go to **Network Access**
+3. Make sure Atlas allows your Render service to connect
+
+For testing, some people temporarily allow:
+
+```text
+0.0.0.0/0
+```
+
+For production, restrict access properly if possible.
+
+## 5. Deploy
+
+After the environment variables are added, Render will build and start the service.
+
+Your live app will serve:
+
+- the frontend pages
+- the API endpoints under `/api/...`
+
+from the same Render web service.
 
 ## 6. Verify deployment
 
-After both services are live:
+After deployment:
 
-- Open the frontend Render URL
-- Confirm the homepage loads
-- Confirm restaurants and menus load from the backend
-- Test signup and login
-- Test adding menu items to cart
+1. Open your Render app URL
+2. Confirm the homepage loads
+3. Confirm restaurants and menu items load
+4. Test signup and login
+5. Test adding items to cart
 
-## 7. Important production notes
+## 7. Important notes
 
-- Your backend must stay publicly reachable if the frontend will call it directly through `BACKEND_API_URL`.
-- MongoDB Atlas must allow Render to connect. If Atlas network rules are too strict, the backend will fail to connect.
-- Replace the current local JWT secret with a strong production value in Render.
-- Since your frontend uses Next.js server routes and runtime fetches, deploy it as a **Web Service**, not a Static Site.
+- Do not set `BACKEND_API_URL` for the one-service Render deployment. It is no longer needed.
+- The `frontend/` app now talks directly to MongoDB through Next.js server routes.
+- Keep `JWT_SECRET` private and set it only in Render and your local env file.
+- Deploy this as a **Web Service**, not a Static Site.
 
-## 8. Recommended Render setup summary
-
-### Backend
-
-- Service type: **Web Service**
-- Root directory: `backend`
-- Build: `npm install`
-- Start: `npm start`
-
-### Frontend
+## 8. Render summary
 
 - Service type: **Web Service**
 - Root directory: `frontend`
@@ -120,7 +109,5 @@ After both services are live:
 ## Official Render references
 
 - Next.js on Render: https://render.com/docs/deploy-nextjs-app
-- Express on Render: https://render.com/docs/deploy-node-express-app
 - Web services: https://render.com/docs/web-services
 - Environment variables: https://render.com/docs/configure-environment-variables
-- Default environment variables: https://render.com/docs/environment-variables

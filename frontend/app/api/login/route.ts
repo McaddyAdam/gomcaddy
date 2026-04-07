@@ -1,20 +1,28 @@
+import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchBackend } from '@/lib/backend-api';
-import type { AuthResponse } from '@/types/types';
+import { loginUser } from '@/lib/server-api';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const data = await fetchBackend<AuthResponse>('/api/login', {
-      method: 'POST',
-      body: JSON.stringify(body),
+
+    if (!body?.email || !body?.password) {
+      return NextResponse.json(
+        { error: 'Email and password are required' },
+        { status: 400 }
+      );
+    }
+
+    const data = await loginUser({
+      email: body.email,
+      password: body.password,
+      bcrypt,
     });
 
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Login failed' },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : 'Login failed';
+    const status = message === 'Invalid email or password' ? 401 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }
