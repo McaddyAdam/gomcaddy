@@ -1,112 +1,126 @@
 # Gomcaddy Render Deployment Guide
 
-This repo should be deployed to Render using **one Blueprint** so both apps are created together from the same repository.
+This project should be deployed to Render as **two separate Web Services**:
 
-That means:
+- `backend/` as a Node + Express API
+- `frontend/` as a Next.js web app
 
-- one `render.yaml` file in the repo root
-- one Blueprint setup flow in Render
-- two services managed together by Render:
-  - `frontend`
-  - `backend`
+This matches Render's current docs for:
 
-This is the best match for Render's current monorepo and Blueprint setup.
+- Next.js apps deployed as a **Node Web Service**
+- Express apps deployed as a **Node Web Service**
 
-Official references:
+## 1. Push your code to GitHub
 
-- Monorepo support: https://render.com/docs/monorepo-support
-- Blueprints overview: https://render.com/docs/infrastructure-as-code
-- Blueprint spec: https://render.com/docs/blueprint-spec
+Render deploys from a Git provider, so first make sure this repository is pushed to GitHub, GitLab, or Bitbucket.
 
-## How this works
-
-Your repository has two apps:
-
-- [frontend](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/frontend)
-- [backend](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/backend)
-
-Render will read the root [render.yaml](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/render.yaml) file and create both services together in one Blueprint deployment.
-
-## Step 1. Push the repo to GitHub
-
-Render deploys from a Git provider, so first push this repository to GitHub, GitLab, or Bitbucket.
-
-## Step 2. Create the Blueprint on Render
+## 2. Deploy the backend on Render
 
 In Render:
 
-1. Click **New**
-2. Click **Blueprint**
-3. Connect your repository
-4. Render will detect the `render.yaml`
-5. Review the services and continue
+1. Click **New**.
+2. Select **Web Service**.
+3. Connect your repository.
+4. Set the following values:
 
-Render will create both services from the same Blueprint.
+### Backend settings
 
-## Step 3. Add required environment variable values
+- **Name**: `gomcaddy-backend`
+- **Root Directory**: `backend`
+- **Environment**: `Node`
+- **Build Command**: `npm install`
+- **Start Command**: `npm start`
 
-The Blueprint file defines the variable names, but you must provide the values in Render.
+### Backend environment variables
 
-### Backend variables
+Add these in Render under the backend service's **Environment** tab:
 
-Set these for the backend service:
+- `MONGODB_URI` = your MongoDB Atlas connection string
+- `JWT_SECRET` = a strong secret key
+- `NODE_ENV` = `production`
 
-- `MONGODB_URI`
-- `JWT_SECRET`
-- `NODE_ENV`
+You do **not** need to hardcode `PORT` on Render unless you want to override it. Render automatically provides a port for web services.
 
-Recommended values:
+## 3. Get the backend Render URL
 
-```env
-NODE_ENV=production
-JWT_SECRET=your-long-random-secret
-MONGODB_URI=your-mongodb-atlas-connection-string
+After the backend deploys, Render will give you a public URL such as:
+
+```text
+https://gomcaddy-backend.onrender.com
 ```
 
-### Frontend variables
+Copy that URL. You will use it in the frontend environment variables.
 
-Set this for the frontend service:
+## 4. Deploy the frontend on Render
 
-- `BACKEND_API_URL`
+In Render:
 
-Use your backend Render URL, for example:
+1. Click **New**.
+2. Select **Web Service**.
+3. Connect the same repository.
+4. Set the following values:
 
-```env
+### Frontend settings
+
+- **Name**: `gomcaddy-frontend`
+- **Root Directory**: `frontend`
+- **Environment**: `Node`
+- **Build Command**: `npm install && npm run build`
+- **Start Command**: `npm start`
+
+### Frontend environment variables
+
+Add:
+
+- `BACKEND_API_URL` = your backend Render URL
+
+Example:
+
+```text
 BACKEND_API_URL=https://gomcaddy-backend.onrender.com
 ```
 
-## Step 4. Let Render deploy both services
+## 5. Redeploy the frontend after setting env vars
 
-After env vars are filled in, Render will build and deploy:
+Once `BACKEND_API_URL` is saved, trigger a deploy if Render does not do it automatically.
 
-- the backend from `backend/`
-- the frontend from `frontend/`
+## 6. Verify deployment
 
-Both are managed from the same Blueprint.
+After both services are live:
 
-## Step 5. Verify deployment
+- Open the frontend Render URL
+- Confirm the homepage loads
+- Confirm restaurants and menus load from the backend
+- Test signup and login
+- Test adding menu items to cart
 
-After deployment:
+## 7. Important production notes
 
-1. Open the frontend URL
-2. Confirm the homepage loads
-3. Confirm restaurants and menu items load
-4. Confirm login and signup work
-5. Confirm the cart flow works
+- Your backend must stay publicly reachable if the frontend will call it directly through `BACKEND_API_URL`.
+- MongoDB Atlas must allow Render to connect. If Atlas network rules are too strict, the backend will fail to connect.
+- Replace the current local JWT secret with a strong production value in Render.
+- Since your frontend uses Next.js server routes and runtime fetches, deploy it as a **Web Service**, not a Static Site.
 
-## Notes
+## 8. Recommended Render setup summary
 
-- This is a **single Render Blueprint deployment**, not one single process running both apps.
-- Render still creates **two services**, because your frontend and backend are separate applications.
-- The advantage is that they are provisioned and managed together from one `render.yaml`.
-- This is the clean Render-native way to deploy a monorepo like this.
+### Backend
 
-## If MongoDB Atlas blocks Render
+- Service type: **Web Service**
+- Root directory: `backend`
+- Build: `npm install`
+- Start: `npm start`
 
-If the backend cannot connect to MongoDB Atlas after deployment:
+### Frontend
 
-1. Open MongoDB Atlas
-2. Go to **Network Access**
-3. Allow Render to connect
+- Service type: **Web Service**
+- Root directory: `frontend`
+- Build: `npm install && npm run build`
+- Start: `npm start`
 
-For testing, some teams temporarily allow `0.0.0.0/0`, but for production you should lock access down properly.
+## Official Render references
+
+- Next.js on Render: https://render.com/docs/deploy-nextjs-app
+- Express on Render: https://render.com/docs/deploy-node-express-app
+- Web services: https://render.com/docs/web-services
+- Environment variables: https://render.com/docs/configure-environment-variables
+- Default environment variables: https://render.com/docs/environment-variables
