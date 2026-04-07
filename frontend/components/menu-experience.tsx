@@ -239,3 +239,5 @@ export function MenuExperience({ restaurantId }: MenuExperienceProps) {
     </div>
   );
 }
+
+export default MenuExperience;

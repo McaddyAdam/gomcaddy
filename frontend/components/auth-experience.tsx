@@ -180,6 +180,8 @@ export function AuthExperience() {
   );
 }
 
+export default AuthExperience;
+
 function Field({
   label,
   value,

@@ -1,9 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { AuthProvider } from '@/components/auth-provider';
-import { CartProvider } from '@/components/cart-provider';
-import { ThemeProvider } from '@/components/theme-provider';
-import { Toaster } from '@/components/ui/toaster';
+import { Providers } from '@/components/providers';
 
 export const metadata: Metadata = {
   title: 'Gomcaddy',
@@ -18,14 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans">
-        <ThemeProvider attribute="class" defaultTheme="light">
-          <AuthProvider>
-            <CartProvider>
-              {children}
-              <Toaster />
-            </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

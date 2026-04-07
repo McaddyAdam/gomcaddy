@@ -114,6 +114,8 @@ If menu data is missing, confirm your MongoDB database actually contains restaur
   Set `MONGODB_URI` and `JWT_SECRET` in Render, then redeploy.
 - App deploys but restaurants do not load:
   Check MongoDB Atlas network access and database credentials.
+- Render keeps failing on an older cached build:
+  redeploy the latest commit and, if needed, use Render's clear cache and deploy option.
 - Render points at the wrong folder:
   Make sure `Root Directory` is exactly `frontend`.
 - You deployed the backend separately and the app still looks broken:
