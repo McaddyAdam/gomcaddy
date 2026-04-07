@@ -1,0 +1,16 @@
+
+> start
+> npm run build && npm --prefix frontend run start
+
+
+> build
+> npm --prefix frontend run build
+
+
+> gomcaddy-frontend@0.1.0 build
+> next build
+
+   Creating an optimized production build...
+ ✓ Compiled successfully
+   Skipping linting
+   Checking validity of types...

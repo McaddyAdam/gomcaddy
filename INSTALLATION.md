@@ -15,11 +15,10 @@ The current app flow can run directly from the Next.js app in `frontend/`, inclu
 
 ## 1. Install the frontend
 
-Open a terminal in the frontend folder:
+From the repo root, install the frontend dependencies:
 
 ```bash
-cd frontend
-npm install
+npm --prefix frontend install
 ```
 
 Create `frontend/.env` from `frontend/.env.example` and set:
@@ -31,7 +30,7 @@ JWT_SECRET=your-secret
 
 ## 2. Start the frontend
 
-From `frontend/`:
+From the repo root:
 
 ```bash
 npm run dev
@@ -39,11 +38,26 @@ npm run dev
 
 The app runs at `http://127.0.0.1:3000`.
 
+You can still run the same commands directly in `frontend/` if you prefer.
+
+For a production-style local check from the repo root:
+
+```bash
+npm start
+```
+
 ## 3. Optional backend folder
 
 The `backend/` folder still exists, but it is not required for the current single-app Next.js flow.
 
 Use it only if you specifically want to run the separate Express backend locally.
+
+Helpful root commands:
+
+```bash
+npm run backend:dev
+npm run backend:seed
+```
 
 ## 4. Verify everything
 

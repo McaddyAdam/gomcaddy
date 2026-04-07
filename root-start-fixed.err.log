@@ -1,0 +1,17 @@
+
+> Build error occurred
+Error: spawn EPERM
+    at ChildProcess.spawn (node:internal/child_process:420:11)
+    at spawn (node:child_process:787:9)
+    at fork (node:child_process:174:10)
+    at ChildProcessWorker.initialize (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\compiled\jest-worker\index.js:1:10927)
+    at new ChildProcessWorker (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\compiled\jest-worker\index.js:1:10815)
+    at WorkerPool.createWorker (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\compiled\jest-worker\index.js:1:6315)
+    at new BaseWorkerPool (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\compiled\jest-worker\index.js:1:8183)
+    at new WorkerPool (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\compiled\jest-worker\index.js:1:6111)
+    at new Worker (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\compiled\jest-worker\index.js:1:23381)
+    at verifyTypeScriptSetup (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\build\type-check.js:70:29) {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'spawn'
+}

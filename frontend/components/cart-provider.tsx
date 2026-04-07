@@ -14,6 +14,7 @@ interface CartContextValue {
   addItem: (restaurant: Restaurant, item: MenuItem) => void;
   removeItem: (itemId: string) => void;
   clearCart: () => void;
+  clearRestaurantCart: (restaurantId: string) => void;
   totalItems: number;
   totalPrice: number;
 }
@@ -25,10 +26,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
-    const storedValue = window.localStorage.getItem(STORAGE_KEY);
-    if (storedValue) {
-      setItems(JSON.parse(storedValue));
+    try {
+      const storedValue = window.localStorage.getItem(STORAGE_KEY);
+      if (!storedValue) {
+        return;
+      }
+
+      const parsed = JSON.parse(storedValue);
+      if (Array.isArray(parsed)) {
+        setItems(
+          parsed.filter(
+            (item): item is CartItem =>
+              item &&
+              typeof item.id === 'string' &&
+              typeof item.name === 'string' &&
+              typeof item.restaurantId === 'string' &&
+              typeof item.restaurantName === 'string' &&
+              typeof item.quantity === 'number' &&
+              typeof item.price === 'number'
+          )
+        );
+        return;
+      }
+    } catch {
+      // Ignore stale or malformed local storage data.
     }
+
+    window.localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   useEffect(() => {
@@ -72,11 +96,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setItems([]);
     };
 
+    const clearRestaurantCart = (restaurantId: string) => {
+      setItems((currentItems) =>
+        currentItems.filter((item) => item.restaurantId !== restaurantId)
+      );
+    };
+
     return {
       items,
       addItem,
       removeItem,
       clearCart,
+      clearRestaurantCart,
       totalItems: items.reduce((sum, item) => sum + item.quantity, 0),
       totalPrice: items.reduce((sum, item) => sum + item.price * item.quantity, 0),
     };

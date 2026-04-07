@@ -18,14 +18,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
-    const storedValue = window.localStorage.getItem(STORAGE_KEY);
-    if (!storedValue) {
-      return;
+    try {
+      const storedValue = window.localStorage.getItem(STORAGE_KEY);
+      if (!storedValue) {
+        return;
+      }
+
+      const parsed = JSON.parse(storedValue) as {
+        token?: string;
+        user?: AuthUser;
+      };
+
+      if (typeof parsed.token === 'string' && parsed.user?.id && parsed.user?.email) {
+        setToken(parsed.token);
+        setUser(parsed.user);
+        return;
+      }
+    } catch {
+      // Ignore stale or malformed local storage data.
     }
 
-    const parsed = JSON.parse(storedValue) as { token: string; user: AuthUser };
-    setToken(parsed.token);
-    setUser(parsed.user);
+    window.localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   const value = useMemo(

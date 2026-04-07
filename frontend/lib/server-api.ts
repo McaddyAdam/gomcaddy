@@ -3,6 +3,29 @@ import type { Category, Restaurant, StoreCount, AuthResponse } from '@/types/typ
 import { connectToDatabase } from '@/lib/mongodb';
 import { CategoryModel, RestaurantModel, UserModel } from '@/lib/server-models';
 
+function buildFallbackMenu(restaurant: any): Restaurant['menu'] {
+  return [
+    {
+      id: `${restaurant._id.toString()}-1`,
+      name: `${restaurant.name} Special`,
+      description: 'Freshly prepared best-seller from this vendor.',
+      price: 12.99,
+      image: restaurant.image,
+      prepTime: '20 mins',
+      featured: true,
+    },
+    {
+      id: `${restaurant._id.toString()}-2`,
+      name: `${restaurant.name} Combo`,
+      description: 'A balanced meal option that works well for lunch or dinner.',
+      price: 9.99,
+      image: restaurant.image,
+      prepTime: '18 mins',
+      featured: false,
+    },
+  ];
+}
+
 export async function getCategories(): Promise<Category[]> {
   await connectToDatabase();
   const categories = await CategoryModel.find().sort({ name: 1 }).lean();
@@ -135,6 +158,18 @@ function formatRestaurant(restaurant: any): Restaurant {
     ratings.length > 0
       ? ratings.reduce((sum: number, rating: number) => sum + rating, 0) / ratings.length
       : 0;
+  const menu =
+    restaurant.menu && restaurant.menu.length > 0
+      ? restaurant.menu.map((item: any, index: number) => ({
+          id: item._id?.toString() ?? `${restaurant._id.toString()}-${index + 1}`,
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          image: item.image,
+          prepTime: item.prepTime,
+          featured: item.featured,
+        }))
+      : buildFallbackMenu(restaurant);
 
   return {
     id: restaurant._id.toString(),
@@ -145,15 +180,7 @@ function formatRestaurant(restaurant: any): Restaurant {
       name: category.name,
       icon: category.icon,
     })),
-    menu: (restaurant.menu || []).map((item: any) => ({
-      id: item._id.toString(),
-      name: item.name,
-      description: item.description,
-      price: item.price,
-      image: item.image,
-      prepTime: item.prepTime,
-      featured: item.featured,
-    })),
+    menu,
     ratings: {
       average: Number(average.toFixed(1)),
       count: ratings.length,

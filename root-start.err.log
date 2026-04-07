@@ -1,0 +1,11 @@
+Error: ENOENT: no such file or directory, open 'C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\.next\BUILD_ID'
+    at async open (node:internal/fs/promises:641:25)
+    at async Object.readFile (node:internal/fs/promises:1245:14)
+    at async setupFsCheck (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\server\lib\router-utils\filesystem.js:142:19)
+    at async initialize (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\server\lib\router-server.js:56:23)
+    at async Server.<anonymous> (C:\Users\adama\mcaddytechsolutions\mcaddytechsolutions\gomcaddy\frontend\node_modules\next\dist\server\lib\start-server.js:219:36) {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\adama\\mcaddytechsolutions\\mcaddytechsolutions\\gomcaddy\\frontend\\.next\\BUILD_ID'
+}

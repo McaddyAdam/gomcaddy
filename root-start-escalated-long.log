@@ -1,0 +1,57 @@
+
+> start
+> npm run build && npm --prefix frontend run start
+
+
+> build
+> npm --prefix frontend run build
+
+
+> gomcaddy-frontend@0.1.0 build
+> next build
+
+   Creating an optimized production build...
+ ✓ Compiled successfully
+   Skipping linting
+   Checking validity of types...
+   Collecting page data...
+   Generating static pages (0/8)...
+   Generating static pages (2/8)
+
+   Generating static pages (4/8)
+
+   Generating static pages (6/8)
+
+ ✓ Generating static pages (8/8)
+   Finalizing page optimization...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    4.9 kB          100 kB
+├ ○ /_not-found                          872 B          80.2 kB
+├ λ /api/categories                      0 B                0 B
+├ λ /api/login                           0 B                0 B
+├ λ /api/register                        0 B                0 B
+├ λ /api/restaurants                     0 B                0 B
+├ λ /api/restaurants/[id]                0 B                0 B
+├ λ /api/store-count                     0 B                0 B
+├ ○ /auth                                4.11 kB        99.3 kB
+├ ○ /menu                                141 B          99.6 kB
+└ λ /menu/[restaurantId]                 141 B          99.6 kB
++ First Load JS shared by all            79.3 kB
+  ├ chunks/864-08480afced3b3961.js       26.5 kB
+  ├ chunks/fd9d1056-9bc591f40a60a661.js  50.9 kB
+  ├ chunks/main-app-48bd30579625265f.js  220 B
+  └ chunks/webpack-a88e545e008f918a.js   1.67 kB
+
+
+λ  (Server)  server-side renders at runtime (uses getInitialProps or getServerSideProps)
+○  (Static)  automatically rendered as static HTML (uses no initial props)
+
+
+> gomcaddy-frontend@0.1.0 start
+> next start
+
+  ▲ Next.js 13.5.1
+  - Local:        http://localhost:3000
+
+ ✓ Ready in 402ms
