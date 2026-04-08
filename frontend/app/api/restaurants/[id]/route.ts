@@ -3,10 +3,11 @@ import { getRestaurantById } from '@/lib/server-api';
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const restaurant = await getRestaurantById(params.id);
+    const { id } = await context.params;
+    const restaurant = await getRestaurantById(id);
 
     if (!restaurant) {
       return NextResponse.json({ error: 'Restaurant not found' }, { status: 404 });

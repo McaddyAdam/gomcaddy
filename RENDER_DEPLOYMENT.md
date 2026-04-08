@@ -42,8 +42,24 @@ Recommended:
 
 Why these commands:
 
-- `npm run build` creates the Next.js production build
+- `npm run build` creates the Next.js production build and now restores/saves `.next/cache` for faster rebuilds when Render exposes a persistent build cache directory
 - `npm start` runs `next start` inside `frontend`
+
+**Build Cache**
+
+The repo now wraps `next build` with a small cache helper in [frontend/scripts/next-build-with-cache.mjs](C:/Users/adama/mcaddytechsolutions/mcaddytechsolutions/gomcaddy/frontend/scripts/next-build-with-cache.mjs).
+
+What it does:
+
+- restores a previous `.next/cache` before `next build`
+- saves the updated `.next/cache` after a successful build
+- uses `NEXT_BUILD_CACHE_DIR` if you set it
+- otherwise uses `XDG_CACHE_HOME` automatically when the deploy environment provides it
+
+Important:
+
+- the first deploy after adding this change can still log `No build cache found` once because there is no warmed cache yet
+- the next deploy should reuse the saved cache unless you choose Render's clear-cache deploy option
 
 **Environment Variables**
 

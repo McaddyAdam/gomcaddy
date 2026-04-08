@@ -1,9 +1,4 @@
-import dynamic from 'next/dynamic';
-
-const MenuExperience = dynamic(() => import('@/components/menu-experience'), {
-  ssr: false,
-  loading: () => <main className="min-h-screen bg-[#f7f4ee]" />,
-});
+import MenuExperience from '@/components/menu-experience';
 
 export default function MenuPage() {
   return <MenuExperience />;

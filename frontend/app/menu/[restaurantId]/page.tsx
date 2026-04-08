@@ -1,14 +1,11 @@
-import dynamic from 'next/dynamic';
+import MenuExperience from '@/components/menu-experience';
 
-const MenuExperience = dynamic(() => import('@/components/menu-experience'), {
-  ssr: false,
-  loading: () => <main className="min-h-screen bg-[#f7f4ee]" />,
-});
-
-export default function RestaurantMenuPage({
+export default async function RestaurantMenuPage({
   params,
 }: {
-  params: { restaurantId: string };
+  params: Promise<{ restaurantId: string }>;
 }) {
-  return <MenuExperience restaurantId={params.restaurantId} />;
+  const { restaurantId } = await params;
+
+  return <MenuExperience restaurantId={restaurantId} />;
 }
