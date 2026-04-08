@@ -1,7 +1,8 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, LockKeyhole, Mail, UserCircle2 } from 'lucide-react';
 import { SiteHeader } from '@/components/site-header';
 import { useAuth } from '@/components/auth-provider';
@@ -11,6 +12,8 @@ import type { AuthResponse } from '@/types/types';
 type Mode = 'login' | 'signup';
 
 export function AuthExperience() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -19,7 +22,20 @@ export function AuthExperience() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { setAuth, user } = useAuth();
+  const { setAuth, user, isHydrated } = useAuth();
+  const nextParam = searchParams.get('next');
+  const redirectTo =
+    nextParam &&
+    nextParam.startsWith('/') &&
+    !nextParam.startsWith('/auth')
+      ? nextParam
+      : '/menu';
+
+  useEffect(() => {
+    if (isHydrated && user) {
+      router.replace(redirectTo);
+    }
+  }, [isHydrated, redirectTo, router, user]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,6 +85,7 @@ export function AuthExperience() {
 
       setAuth(data.token, data.user);
       setMessage(mode === 'signup' ? 'Account created successfully.' : 'Login successful.');
+      router.replace(redirectTo);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Authentication failed');
     } finally {
@@ -102,77 +119,80 @@ export function AuthExperience() {
           </section>
 
           <section className="rounded-[32px] bg-white p-8 shadow-xl shadow-black/10">
-            <div className="inline-flex rounded-full bg-slate-100 p-1">
-              <button
-                onClick={() => setMode('login')}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition ${
-                  mode === 'login' ? 'bg-slate-950 text-white' : 'text-slate-500'
-                }`}
-              >
-                Login
-              </button>
-              <button
-                onClick={() => setMode('signup')}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition ${
-                  mode === 'signup' ? 'bg-slate-950 text-white' : 'text-slate-500'
-                }`}
-              >
-                Signup
-              </button>
-            </div>
+            {isHydrated && user ? (
+              <div className="rounded-3xl bg-slate-100 px-5 py-4 text-sm text-slate-700">
+                Signed in as {user.name}. Redirecting you back now...
+              </div>
+            ) : (
+              <>
+                <div className="inline-flex rounded-full bg-slate-100 p-1">
+                  <button
+                    onClick={() => setMode('login')}
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition ${
+                      mode === 'login' ? 'bg-slate-950 text-white' : 'text-slate-500'
+                    }`}
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => setMode('signup')}
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition ${
+                      mode === 'signup' ? 'bg-slate-950 text-white' : 'text-slate-500'
+                    }`}
+                  >
+                    Signup
+                  </button>
+                </div>
 
-            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-              {mode === 'signup' && (
-                <Field
-                  label="Full name"
-                  value={name}
-                  onChange={setName}
-                  placeholder="Enter your full name"
-                />
-              )}
+                <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                  {mode === 'signup' && (
+                    <Field
+                      label="Full name"
+                      value={name}
+                      onChange={setName}
+                      placeholder="Enter your full name"
+                    />
+                  )}
 
-              <Field
-                label="Email address"
-                value={email}
-                onChange={setEmail}
-                placeholder="you@example.com"
-                type="email"
-              />
+                  <Field
+                    label="Email address"
+                    value={email}
+                    onChange={setEmail}
+                    placeholder="you@example.com"
+                    type="email"
+                  />
 
-              <Field
-                label="Password"
-                value={password}
-                onChange={setPassword}
-                placeholder="At least 6 characters"
-                type="password"
-              />
+                  <Field
+                    label="Password"
+                    value={password}
+                    onChange={setPassword}
+                    placeholder="At least 6 characters"
+                    type="password"
+                  />
 
-              {mode === 'signup' && (
-                <Field
-                  label="Confirm password"
-                  value={confirmPassword}
-                  onChange={setConfirmPassword}
-                  placeholder="Repeat your password"
-                  type="password"
-                />
-              )}
+                  {mode === 'signup' && (
+                    <Field
+                      label="Confirm password"
+                      value={confirmPassword}
+                      onChange={setConfirmPassword}
+                      placeholder="Repeat your password"
+                      type="password"
+                    />
+                  )}
 
-              {error && <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-              {message && <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</p>}
-              {user && (
-                <p className="rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700">
-                  Signed in as {user.name} ({user.email})
-                </p>
-              )}
+                  {error && <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+                  {message && <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</p>}
 
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="h-12 w-full rounded-full bg-emerald-500 text-base font-semibold text-slate-950 hover:bg-emerald-400"
-              >
-                {isSubmitting ? 'Please wait...' : mode === 'signup' ? 'Create account' : 'Login'}
-              </Button>
-            </form>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="h-12 w-full rounded-full bg-emerald-500 text-base font-semibold text-slate-950 hover:bg-emerald-400"
+                  >
+                    {isSubmitting ? 'Please wait...' : mode === 'signup' ? 'Create account' : 'Login'}
+                  </Button>
+                </form>
+              </>
+            )}
           </section>
         </div>
       </main>

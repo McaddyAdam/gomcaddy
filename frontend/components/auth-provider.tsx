@@ -6,6 +6,7 @@ import type { AuthUser } from '@/types/types';
 interface AuthState {
   user: AuthUser | null;
   token: string | null;
+  isHydrated: boolean;
   setAuth: (token: string, user: AuthUser) => void;
   logout: () => void;
 }
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthState | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     try {
@@ -36,6 +38,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch {
       // Ignore stale or malformed local storage data.
+    } finally {
+      setIsHydrated(true);
     }
 
     window.localStorage.removeItem(STORAGE_KEY);
@@ -45,9 +49,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => ({
       user,
       token,
+      isHydrated,
       setAuth: (nextToken: string, nextUser: AuthUser) => {
         setToken(nextToken);
         setUser(nextUser);
+        setIsHydrated(true);
         window.localStorage.setItem(
           STORAGE_KEY,
           JSON.stringify({ token: nextToken, user: nextUser })
@@ -56,10 +62,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout: () => {
         setToken(null);
         setUser(null);
+        setIsHydrated(true);
         window.localStorage.removeItem(STORAGE_KEY);
       },
     }),
-    [token, user]
+    [isHydrated, token, user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,10 +1,12 @@
 "use client";
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Clock3, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock3, CreditCard, Minus, Plus, ShoppingCart, Star, Truck } from 'lucide-react';
 import { SiteHeader } from '@/components/site-header';
 import { useCart } from '@/components/cart-provider';
+import { useAuth } from '@/components/auth-provider';
 import { Button } from '@/components/ui/button';
 import type { Restaurant } from '@/types/types';
 
@@ -13,11 +15,19 @@ interface MenuExperienceProps {
 }
 
 export function MenuExperience({ restaurantId }: MenuExperienceProps) {
+  const pathname = usePathname();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>(restaurantId || '');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { addItem, items, removeItem, totalPrice } = useCart();
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [phone, setPhone] = useState('');
+  const [note, setNote] = useState('');
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const { addItem, items, removeItem, clearRestaurantCart } = useCart();
+  const { user, token, isHydrated } = useAuth();
 
   useEffect(() => {
     const loadRestaurants = async () => {
@@ -58,6 +68,113 @@ export function MenuExperience({ restaurantId }: MenuExperienceProps) {
 
     return items.filter((item) => item.restaurantId === selectedRestaurant.id);
   }, [items, selectedRestaurant]);
+
+  const selectedTotalPrice = useMemo(
+    () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [cartItems]
+  );
+  const isLoggedIn = Boolean(user && token);
+  const loginHref = useMemo(() => {
+    const nextPath =
+      pathname.startsWith('/menu/') && restaurantId
+        ? pathname
+        : selectedRestaurantId
+          ? `/menu/${selectedRestaurantId}`
+          : '/menu';
+
+    return `/auth?next=${encodeURIComponent(nextPath)}`;
+  }, [pathname, restaurantId, selectedRestaurantId]);
+
+  useEffect(() => {
+    if (isLoggedIn && checkoutError === 'Please login to complete checkout.') {
+      setCheckoutError(null);
+    }
+  }, [checkoutError, isLoggedIn]);
+
+  const handleCheckout = async () => {
+    if (!selectedRestaurant) {
+      setCheckoutError('Select a restaurant before checkout.');
+      return;
+    }
+
+    if (!isHydrated) {
+      setCheckoutError('Restoring your login session. Please try again in a moment.');
+      return;
+    }
+
+    if (!user || !token) {
+      setCheckoutError('Please login to complete checkout.');
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      setCheckoutError('Add food items before checkout.');
+      return;
+    }
+
+    if (!deliveryAddress.trim()) {
+      setCheckoutError('Delivery address is required.');
+      return;
+    }
+
+    if (!phone.trim()) {
+      setCheckoutError('Phone number is required.');
+      return;
+    }
+
+    try {
+      setIsPlacingOrder(true);
+      setCheckoutError(null);
+      setCheckoutMessage(null);
+
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userName: user.name,
+          restaurantId: selectedRestaurant.id,
+          restaurantName: selectedRestaurant.name,
+          items: cartItems.map((item) => ({
+            itemId: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+          })),
+          paymentMethod: 'pay_on_delivery',
+          deliveryAddress: deliveryAddress.trim(),
+          phone: phone.trim(),
+          note: note.trim(),
+        }),
+      });
+
+      const data = (await response.json()) as {
+        message?: string;
+        orderId?: string;
+        error?: string;
+      };
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Failed to place order');
+      }
+
+      clearRestaurantCart(selectedRestaurant.id);
+      setDeliveryAddress('');
+      setPhone('');
+      setNote('');
+      setCheckoutMessage(
+        `Order placed successfully. Payment method: Pay on delivery. Order #${data.orderId || 'created'}.`
+      );
+    } catch (placeOrderError) {
+      setCheckoutError(
+        placeOrderError instanceof Error ? placeOrderError.message : 'Failed to place order'
+      );
+    } finally {
+      setIsPlacingOrder(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f7f4ee] text-slate-900">
@@ -223,14 +340,98 @@ export function MenuExperience({ restaurantId }: MenuExperienceProps) {
               <div className="mt-8 rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-300">Estimated total</span>
-                  <span className="text-2xl font-semibold">${totalPrice.toFixed(2)}</span>
+                  <span className="text-2xl font-semibold">${selectedTotalPrice.toFixed(2)}</span>
                 </div>
-                <p className="mt-3 text-sm text-slate-400">
-                  Login or register to continue checkout once your backend auth is active.
-                </p>
-                <Button asChild className="mt-5 w-full rounded-full bg-emerald-500 text-slate-950 hover:bg-emerald-400">
-                  <Link href="/auth">Continue to login</Link>
-                </Button>
+
+                {!isHydrated ? (
+                  <p className="mt-3 text-sm text-slate-400">
+                    Checking your login session before checkout...
+                  </p>
+                ) : !isLoggedIn ? (
+                  <>
+                    <p className="mt-3 text-sm text-slate-400">
+                      Login or register to continue checkout and place your order.
+                    </p>
+                    <Button
+                      asChild
+                      className="mt-5 w-full rounded-full bg-emerald-500 text-slate-950 hover:bg-emerald-400"
+                    >
+                      <Link href={loginHref}>Continue to login</Link>
+                    </Button>
+                  </>
+                ) : (
+                  <div className="mt-5 space-y-4">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Checkout</p>
+                      <p className="mt-2 text-sm text-slate-300">
+                        Logged in as {user?.name}. Add your delivery details and finish your order.
+                      </p>
+                    </div>
+
+                    <label className="block">
+                      <span className="mb-2 block text-sm text-slate-300">Delivery address</span>
+                      <textarea
+                        value={deliveryAddress}
+                        onChange={(event) => setDeliveryAddress(event.target.value)}
+                        placeholder="House number, street, area"
+                        rows={3}
+                        className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="mb-2 block text-sm text-slate-300">Phone number</span>
+                      <input
+                        value={phone}
+                        onChange={(event) => setPhone(event.target.value)}
+                        placeholder="e.g. +1 555 123 4567"
+                        className="h-11 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none transition focus:border-emerald-400"
+                      />
+                    </label>
+
+                    <div className="rounded-2xl border border-emerald-300/20 bg-emerald-400/10 p-4">
+                      <div className="flex items-center gap-2 text-sm font-medium text-emerald-200">
+                        <CreditCard className="h-4 w-4" />
+                        Payment method
+                      </div>
+                      <p className="mt-2 flex items-center gap-2 text-sm text-slate-300">
+                        <Truck className="h-4 w-4 text-emerald-300" />
+                        Pay on delivery
+                      </p>
+                    </div>
+
+                    <label className="block">
+                      <span className="mb-2 block text-sm text-slate-300">Order note (optional)</span>
+                      <input
+                        value={note}
+                        onChange={(event) => setNote(event.target.value)}
+                        placeholder="Gate code, nearest landmark, special request"
+                        className="h-11 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none transition focus:border-emerald-400"
+                      />
+                    </label>
+
+                    {checkoutError && (
+                      <p className="rounded-2xl border border-red-400/20 bg-red-500/15 px-4 py-3 text-sm text-red-100">
+                        {checkoutError}
+                      </p>
+                    )}
+
+                    {checkoutMessage && (
+                      <p className="flex items-center gap-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/15 px-4 py-3 text-sm text-emerald-100">
+                        <CheckCircle2 className="h-4 w-4" />
+                        {checkoutMessage}
+                      </p>
+                    )}
+
+                    <Button
+                      onClick={handleCheckout}
+                      disabled={isPlacingOrder || cartItems.length === 0}
+                      className="w-full rounded-full bg-emerald-500 text-slate-950 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isPlacingOrder ? 'Finishing order...' : 'Finish order'}
+                    </Button>
+                  </div>
+                )}
               </div>
             </aside>
           </div>

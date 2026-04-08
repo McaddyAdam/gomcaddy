@@ -53,9 +53,48 @@ const userSchema = new Schema(
   { timestamps: true, versionKey: false }
 );
 
+const orderItemSchema = new Schema(
+  {
+    itemId: { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true },
+    price: { type: Number, required: true },
+    quantity: { type: Number, required: true, min: 1 },
+  },
+  { _id: false }
+);
+
+const orderSchema = new Schema(
+  {
+    userId: { type: String, required: true, trim: true },
+    userName: { type: String, required: true, trim: true },
+    userEmail: { type: String, required: true, trim: true },
+    restaurantId: { type: String, required: true, trim: true },
+    restaurantName: { type: String, required: true, trim: true },
+    items: { type: [orderItemSchema], default: [] },
+    total: { type: Number, required: true },
+    paymentMethod: {
+      type: String,
+      enum: ['pay_on_delivery'],
+      default: 'pay_on_delivery',
+      required: true,
+    },
+    deliveryAddress: { type: String, required: true, trim: true },
+    phone: { type: String, required: true, trim: true },
+    note: { type: String, default: '', trim: true },
+    status: {
+      type: String,
+      enum: ['pending', 'confirmed', 'delivered', 'cancelled'],
+      default: 'pending',
+      required: true,
+    },
+  },
+  { timestamps: true, versionKey: false }
+);
+
 export type CategoryDocument = InferSchemaType<typeof categorySchema>;
 export type RestaurantDocument = InferSchemaType<typeof restaurantSchema>;
 export type UserDocument = InferSchemaType<typeof userSchema>;
+export type OrderDocument = InferSchemaType<typeof orderSchema>;
 
 export const CategoryModel =
   (mongoose.models.Category as Model<CategoryDocument>) ||
@@ -68,3 +107,7 @@ export const RestaurantModel =
 export const UserModel =
   (mongoose.models.User as Model<UserDocument>) ||
   mongoose.model<UserDocument>('User', userSchema);
+
+export const OrderModel =
+  (mongoose.models.Order as Model<OrderDocument>) ||
+  mongoose.model<OrderDocument>('Order', orderSchema);

@@ -47,3 +47,28 @@ export interface AuthResponse {
   token: string;
   user: AuthUser;
 }
+
+export type OrderStatus = 'pending' | 'confirmed' | 'delivered' | 'cancelled';
+
+export type PaymentMethod = 'pay_on_delivery';
+
+export interface OrderItem {
+  itemId: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+export interface Order {
+  id: string;
+  restaurantId: string;
+  restaurantName: string;
+  items: OrderItem[];
+  total: number;
+  paymentMethod: PaymentMethod;
+  deliveryAddress: string;
+  phone: string;
+  note: string;
+  status: OrderStatus;
+  createdAt: string;
+}

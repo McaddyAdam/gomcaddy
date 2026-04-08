@@ -1,14 +1,20 @@
 "use client";
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ShoppingBag, UserCircle2 } from 'lucide-react';
 import { useCart } from '@/components/cart-provider';
 import { useAuth } from '@/components/auth-provider';
 import { Button } from '@/components/ui/button';
 
 export function SiteHeader() {
+  const pathname = usePathname();
   const { totalItems } = useCart();
-  const { user, logout } = useAuth();
+  const { user, logout, isHydrated } = useAuth();
+  const authHref =
+    pathname && pathname !== '/auth'
+      ? `/auth?next=${encodeURIComponent(pathname)}`
+      : '/auth';
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/90 backdrop-blur">
@@ -26,7 +32,8 @@ export function SiteHeader() {
         <nav className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
           <Link href="/">Home</Link>
           <Link href="/menu">Menu</Link>
-          <Link href="/auth">Login / Signup</Link>
+          <Link href="/orders">Orders</Link>
+          {!user && isHydrated ? <Link href={authHref}>Login / Signup</Link> : null}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -38,11 +45,11 @@ export function SiteHeader() {
                 Logout
               </button>
             </div>
-          ) : (
+          ) : isHydrated ? (
             <Button asChild variant="secondary" className="hidden rounded-full bg-white text-slate-950 hover:bg-slate-200 md:inline-flex">
-              <Link href="/auth">Sign in</Link>
+              <Link href={authHref}>Sign in</Link>
             </Button>
-          )}
+          ) : null}
 
           <Link
             href="/menu"
