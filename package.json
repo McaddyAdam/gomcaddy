@@ -5,6 +5,7 @@
     "dev": "npm --prefix frontend run dev",
     "build": "npm --prefix frontend run build",
     "start": "npm run build && npm --prefix frontend run start",
+    "docs:pdf": "node ./scripts/generate-gomcaddy-description-pdf.mjs",
     "frontend:dev": "npm --prefix frontend run dev",
     "frontend:build": "npm --prefix frontend run build",
     "frontend:start": "npm --prefix frontend run start",
